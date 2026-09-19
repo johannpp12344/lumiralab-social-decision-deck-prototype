@@ -88,6 +88,7 @@ function loadState() {
     return {
       ...baseState(),
       ...saved,
+      busy: false,
       decisions: saved.decisions && typeof saved.decisions === "object" ? saved.decisions : {},
       events: Array.isArray(saved.events) ? saved.events : []
     };
