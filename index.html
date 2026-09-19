@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0056A4">
-  <meta name="description" content="Touch-first UX-Prototyp für LumiraLab Social-Media-Entscheidungen.">
+  <meta name="description" content="LumiraLab Social Check — Usability-Testprototyp.">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
   <title>LumiraLab · Social Check</title>
@@ -16,43 +16,46 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-name">lumira<span>lab</span></span>
       </div>
-      <span class="prototype-pill">TOUCH-FIRST · PROTOTYP</span>
+      <div class="topbar-right">
+        <span class="test-badge" id="testModeBadge" hidden>TEST</span>
+        <span class="prototype-pill">PROTOTYP</span>
+      </div>
     </header>
 
     <section class="intro" aria-labelledby="page-title">
       <div>
-        <p class="eyebrow">DEIN KURZER CHECK</p>
+        <p class="eyebrow">DEIN KURZER SOCIAL-CHECK</p>
         <h1 id="page-title">Was soll mit<br><em>diesem Draft passieren?</em></h1>
       </div>
       <div class="progress-block" aria-label="Fortschritt">
-        <span id="progressLabel">1 / 3</span>
+        <span id="progressLabel">1 von 5</span>
         <div class="progress-track"><span id="progressBar"></span></div>
       </div>
     </section>
 
     <section class="microcopy" aria-live="polite">
       <span class="status-dot"></span>
-      <span>Du entscheidest nur den nächsten Arbeitsschritt. Nichts wird veröffentlicht.</span>
+      <span>Du entscheidest nur den nächsten Schritt · nichts wird veröffentlicht</span>
     </section>
 
     <article class="decision-card" id="decisionCard" aria-label="Social-Media-Entscheidungskarte">
       <div class="empty-state" id="emptyState" hidden>
         <span class="empty-mark">✓</span>
-        <p class="card-kicker">STAPEL GELEERT</p>
-        <h2>Für heute ist nichts mehr offen.</h2>
-        <p>Die Demo hat nur lokale Zustände verändert. Es wurde nichts veröffentlicht.</p>
-        <button class="reset-button reset-main" type="button">Stapel neu laden</button>
+        <p class="card-kicker">TESTSTAPEL GELEERT</p>
+        <h2>Das war der komplette Test.</h2>
+        <p>Bitte bewerte unten kurz, wie verständlich die Aufgabe war.</p>
+        <button class="reset-button reset-main" type="button">Test neu starten</button>
       </div>
 
       <div class="card-head">
         <div class="chips">
-          <span class="chip chip-blue" id="areaChip">LUMIRALAB</span>
+          <span class="chip chip-blue">LUMIRALAB</span>
           <span class="chip" id="formatChip">INSTAGRAM · CAROUSEL</span>
         </div>
         <span class="card-index" id="cardIndex">01</span>
       </div>
 
-      <div class="asset-placeholder" aria-label="Bildplatzhalter für Original-Asset">
+      <div class="asset-placeholder" aria-label="Bildplatzhalter">
         <div class="asset-orbit orbit-one"></div>
         <div class="asset-orbit orbit-two"></div>
         <div class="asset-cross">+</div>
@@ -65,21 +68,25 @@
           <span class="callout-label">DEINE ENTSCHEIDUNG</span>
           <h2 id="decisionQuestion">Soll ich daraus ein Carousel zur Textprüfung machen?</h2>
         </div>
+
         <div class="why-block">
-          <span class="callout-label">WARUM LIEGT DAS HIER?</span>
+          <span class="copy-label">WARUM LIEGT DAS HIER?</span>
           <p id="cardReason"></p>
         </div>
+
         <div class="copy-preview">
           <span class="copy-label">ENTWURF</span>
           <p id="cardCopy"></p>
         </div>
+
         <div class="next-step">
-          <span class="callout-label">WAS PASSIERT BEI „JA“?</span>
+          <span class="copy-label">WAS PASSIERT BEI JA?</span>
           <p id="nextStep"></p>
         </div>
+
         <button class="source-toggle" id="sourceToggle" type="button" aria-expanded="false">
           <span class="source-icon" aria-hidden="true">↗</span>
-          <span>Quelle und Prüfhinweis öffnen</span>
+          <span id="sourceToggleLabel">Quelle und Prüfhinweis öffnen</span>
           <span class="chevron" aria-hidden="true">⌄</span>
         </button>
         <div class="source-panel" id="sourcePanel" hidden>
@@ -89,29 +96,29 @@
         </div>
       </div>
 
-      <div class="swipe-handle" id="swipeHandle" role="button" tabindex="0" aria-label="Optionaler Gestenbereich. Nur eine deutliche Wischbewegung entscheidet.">
+      <div class="swipe-handle" id="swipeHandle" role="button" tabindex="0" aria-label="Optionaler Wischbereich">
         <span class="handle-bar" aria-hidden="true"></span>
         <span class="handle-copy">Optional: hier bewusst wischen</span>
-        <span class="handle-hint">← nein · ↑ später · ja →</span>
-        <div class="swipe-feedback" id="swipeFeedback" aria-live="polite"></div>
+        <span class="handle-hint">← nein&nbsp;&nbsp; · &nbsp;&nbsp;↑ später&nbsp;&nbsp; · &nbsp;&nbsp;ja →</span>
+        <span class="swipe-feedback" id="swipeFeedback" aria-live="polite"></span>
       </div>
     </article>
 
     <section class="action-dock" aria-label="Entscheidung treffen">
-      <button class="gesture-button gesture-stop" data-action="reject" type="button">
-        <span class="gesture-symbol">×</span>
-        <span class="action-title" id="rejectLabel">Nein, nicht weiter</span>
-        <span class="action-sub">aus dem Stapel</span>
+      <button class="decision-button gesture-stop" data-action="reject" type="button">
+        <span class="decision-symbol">×</span>
+        <span class="decision-title" id="rejectLabel">Nein, nicht weiter</span>
+        <span class="decision-sub">aus dem Stapel</span>
       </button>
-      <button class="gesture-button gesture-later" data-action="later" type="button">
-        <span class="gesture-symbol">◷</span>
-        <span class="action-title">Später</span>
-        <span class="action-sub">für später merken</span>
+      <button class="decision-button gesture-later" data-action="later" type="button">
+        <span class="decision-symbol">◷</span>
+        <span class="decision-title" id="laterLabel">Später</span>
+        <span class="decision-sub">für später speichern</span>
       </button>
-      <button class="gesture-button gesture-approve" data-action="prepare" type="button">
-        <span class="gesture-symbol">✓</span>
-        <span class="action-title" id="prepareLabel">Ja, Textprüfung</span>
-        <span class="action-sub">nächsten Schritt starten</span>
+      <button class="decision-button gesture-approve" data-action="prepare" type="button">
+        <span class="decision-symbol">✓</span>
+        <span class="decision-title" id="prepareLabel">Ja, weiter</span>
+        <span class="decision-sub">nächsten Schritt starten</span>
       </button>
     </section>
 
@@ -123,12 +130,25 @@
     <section class="day-summary" aria-labelledby="summary-title">
       <div class="summary-head">
         <div>
-          <p class="eyebrow">HEUTE</p>
-          <h2 id="summary-title">Dein Social-Stapel</h2>
+          <p class="eyebrow">ÜBERSICHT</p>
+          <h2 id="summary-title">Dein Social-Check</h2>
         </div>
-        <button class="reset-button" id="resetButton" type="button">Demo zurücksetzen</button>
+        <button class="reset-button" id="resetButton" type="button">Zurücksetzen</button>
       </div>
       <div class="summary-grid" id="summaryGrid"></div>
+    </section>
+
+    <section class="test-panel" id="testPanel" hidden aria-labelledby="test-title">
+      <p class="eyebrow">TESTABSCHLUSS</p>
+      <h2 id="test-title">Wie verständlich war die Aufgabe?</h2>
+      <p>Bitte erst nach allen Karten bewerten. Der Testbericht bleibt lokal und wird nicht automatisch gesendet.</p>
+      <div class="rating-row" role="group" aria-label="Klarheitsbewertung">
+        <button class="rating-button" data-rating="klar" type="button">Klar</button>
+        <button class="rating-button" data-rating="teilweise" type="button">Teilweise</button>
+        <button class="rating-button" data-rating="unklar" type="button">Unklar</button>
+      </div>
+      <button class="copy-report" id="copyReport" type="button">Testbericht kopieren</button>
+      <p class="copy-status" id="copyStatus" role="status" aria-live="polite"></p>
     </section>
 
     <footer class="prototype-footer">
