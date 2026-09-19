@@ -9,7 +9,7 @@ python3 -m http.server 8765 --bind 127.0.0.1
 
 Dann im Browser `http://127.0.0.1:8765/` öffnen.
 
-## Bedienung v2
+## Bedienung v3
 
 - Die drei großen Buttons sind die primäre Bedienung.
 - Karte antippen: keine Aktion — die Aufgabe bleibt sichtbar und stabil.
@@ -21,6 +21,12 @@ Dann im Browser `http://127.0.0.1:8765/` öffnen.
 - Deutlicher Wisch nach oben: später.
 - Pfeiltasten: gleiche Entscheidungen auf Desktop.
 - „Demo zurücksetzen“: lokalen Zustand löschen.
+
+## Usability-Test
+
+Für den vorbereiteten Test den Link mit `?test=1` öffnen. Nach dem Durchlauf kann
+Johann eine Klarheitsbewertung abgeben und einen lokalen Testbericht in die
+Zwischenablage kopieren.
 
 ## Sicherheitsgrenze
 
