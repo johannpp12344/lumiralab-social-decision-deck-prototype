@@ -1,4 +1,4 @@
-const CACHE = "lumira-social-decision-deck-v1";
+const CACHE = "lumira-social-decision-deck-v2";
 const ASSETS = ["./", "./index.html", "./styles.css", "./app.js", "./manifest.webmanifest"];
 
 self.addEventListener("install", (event) => {
