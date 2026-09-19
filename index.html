@@ -4,10 +4,10 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0056A4">
-  <meta name="description" content="Lokaler UX-Prototyp für LumiraLab Social-Media-Entscheidungen.">
+  <meta name="description" content="Touch-first UX-Prototyp für LumiraLab Social-Media-Entscheidungen.">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="styles.css">
-  <title>LumiraLab · Social Decision Deck</title>
+  <title>LumiraLab · Social Check</title>
 </head>
 <body>
   <main class="app-shell" id="app">
@@ -16,13 +16,13 @@
         <span class="brand-mark" aria-hidden="true"></span>
         <span class="brand-name">lumira<span>lab</span></span>
       </div>
-      <span class="prototype-pill">PROTOTYP</span>
+      <span class="prototype-pill">TOUCH-FIRST · PROTOTYP</span>
     </header>
 
     <section class="intro" aria-labelledby="page-title">
       <div>
-        <p class="eyebrow">SOCIAL DECISION DECK</p>
-        <h1 id="page-title">Eine Karte.<br><em>Eine Entscheidung.</em></h1>
+        <p class="eyebrow">DEIN KURZER CHECK</p>
+        <h1 id="page-title">Was soll mit<br><em>diesem Draft passieren?</em></h1>
       </div>
       <div class="progress-block" aria-label="Fortschritt">
         <span id="progressLabel">1 / 3</span>
@@ -32,11 +32,10 @@
 
     <section class="microcopy" aria-live="polite">
       <span class="status-dot"></span>
-      <span>Nur vorbereiten · noch nichts veröffentlichen</span>
+      <span>Du entscheidest nur den nächsten Arbeitsschritt. Nichts wird veröffentlicht.</span>
     </section>
 
-    <article class="decision-card" id="decisionCard" tabindex="0" aria-label="Social-Media-Entscheidungskarte">
-      <div class="swipe-feedback" id="swipeFeedback" aria-hidden="true"></div>
+    <article class="decision-card" id="decisionCard" aria-label="Social-Media-Entscheidungskarte">
       <div class="empty-state" id="emptyState" hidden>
         <span class="empty-mark">✓</span>
         <p class="card-kicker">STAPEL GELEERT</p>
@@ -44,6 +43,7 @@
         <p>Die Demo hat nur lokale Zustände verändert. Es wurde nichts veröffentlicht.</p>
         <button class="reset-button reset-main" type="button">Stapel neu laden</button>
       </div>
+
       <div class="card-head">
         <div class="chips">
           <span class="chip chip-blue" id="areaChip">LUMIRALAB</span>
@@ -52,7 +52,7 @@
         <span class="card-index" id="cardIndex">01</span>
       </div>
 
-      <div class="asset-placeholder" id="assetPlaceholder">
+      <div class="asset-placeholder" aria-label="Bildplatzhalter für Original-Asset">
         <div class="asset-orbit orbit-one"></div>
         <div class="asset-orbit orbit-two"></div>
         <div class="asset-cross">+</div>
@@ -61,11 +61,21 @@
 
       <div class="card-body">
         <div class="card-kicker" id="cardKicker">CLAIM-CHECK OFFEN</div>
-        <h2 id="cardTitle">Schimmelanalyse: vom Verdacht zum Befund</h2>
-        <p class="decision-question" id="decisionQuestion">Darf dieser Draft in die visuelle Produktion?</p>
+        <div class="decision-callout">
+          <span class="callout-label">DEINE ENTSCHEIDUNG</span>
+          <h2 id="decisionQuestion">Soll ich daraus ein Carousel zur Textprüfung machen?</h2>
+        </div>
+        <div class="why-block">
+          <span class="callout-label">WARUM LIEGT DAS HIER?</span>
+          <p id="cardReason"></p>
+        </div>
         <div class="copy-preview">
-          <span class="copy-label">DRAFT-COPY</span>
+          <span class="copy-label">ENTWURF</span>
           <p id="cardCopy"></p>
+        </div>
+        <div class="next-step">
+          <span class="callout-label">WAS PASSIERT BEI „JA“?</span>
+          <p id="nextStep"></p>
         </div>
         <button class="source-toggle" id="sourceToggle" type="button" aria-expanded="false">
           <span class="source-icon" aria-hidden="true">↗</span>
@@ -79,23 +89,29 @@
         </div>
       </div>
 
-      <div class="card-hint" aria-hidden="true">
-        <span>← stoppen</span><span>tippen: Beleg</span><span>freigeben →</span>
+      <div class="swipe-handle" id="swipeHandle" role="button" tabindex="0" aria-label="Optionaler Gestenbereich. Nur eine deutliche Wischbewegung entscheidet.">
+        <span class="handle-bar" aria-hidden="true"></span>
+        <span class="handle-copy">Optional: hier bewusst wischen</span>
+        <span class="handle-hint">← nein · ↑ später · ja →</span>
+        <div class="swipe-feedback" id="swipeFeedback" aria-live="polite"></div>
       </div>
     </article>
 
     <section class="action-dock" aria-label="Entscheidung treffen">
       <button class="gesture-button gesture-stop" data-action="reject" type="button">
         <span class="gesture-symbol">×</span>
-        <span>Stopp</span>
+        <span class="action-title" id="rejectLabel">Nein, nicht weiter</span>
+        <span class="action-sub">aus dem Stapel</span>
       </button>
       <button class="gesture-button gesture-later" data-action="later" type="button">
         <span class="gesture-symbol">◷</span>
-        <span>Später</span>
+        <span class="action-title">Später</span>
+        <span class="action-sub">für später merken</span>
       </button>
       <button class="gesture-button gesture-approve" data-action="prepare" type="button">
         <span class="gesture-symbol">✓</span>
-        <span>Vormerken</span>
+        <span class="action-title" id="prepareLabel">Ja, Textprüfung</span>
+        <span class="action-sub">nächsten Schritt starten</span>
       </button>
     </section>
 
