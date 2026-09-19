@@ -1,4 +1,4 @@
-# LumiraLab Social Decision Deck — lokaler Prototyp
+# LumiraLab Social Check — lokaler UX-Prototyp
 
 ## Start
 
@@ -9,15 +9,18 @@ python3 -m http.server 8765 --bind 127.0.0.1
 
 Dann im Browser `http://127.0.0.1:8765/` öffnen.
 
-## Bedienung
+## Bedienung v2
 
-- Karte antippen: Quelle und Prüfhinweis öffnen
-- nach rechts wischen: zur Produktion vormerken
-- nach links wischen: zurückstellen
-- nach oben wischen: später
-- Buttons unten: zugängliche Alternative
-- Pfeiltasten: gleiche Entscheidungen auf Desktop
-- „Demo zurücksetzen“: lokalen Zustand löschen
+- Die drei großen Buttons sind die primäre Bedienung.
+- Karte antippen: keine Aktion — die Aufgabe bleibt sichtbar und stabil.
+- Quelle und Prüfhinweis über den eigenen Button öffnen.
+- Optional nur im markierten Griffbereich wischen.
+- Kleine Bewegungen lösen nichts aus.
+- Deutlicher Wisch nach rechts: Ja, nächsten Arbeitsschritt starten.
+- Deutlicher Wisch nach links: Nein, nicht weiter.
+- Deutlicher Wisch nach oben: später.
+- Pfeiltasten: gleiche Entscheidungen auf Desktop.
+- „Demo zurücksetzen“: lokalen Zustand löschen.
 
 ## Sicherheitsgrenze
 
