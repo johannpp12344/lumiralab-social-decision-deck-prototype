@@ -1,0 +1,11 @@
+{
+  "name": "LumiraLab Social Decision Deck",
+  "short_name": "Lumira Deck",
+  "lang": "de",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#F8FAFC",
+  "theme_color": "#0056A4",
+  "description": "Lokaler UX-Prototyp für Social-Media-Entscheidungen bei LumiraLab.",
+  "icons": []
+}
