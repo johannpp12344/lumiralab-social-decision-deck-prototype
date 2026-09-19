@@ -1,13 +1,18 @@
-const STORAGE_KEY = "lumira-social-decision-deck:v1";
+const STORAGE_KEY = "lumira-social-decision-deck:v2";
+const SWIPE_THRESHOLD_X = 150;
+const SWIPE_THRESHOLD_Y = 120;
+const ACTIVATION_DISTANCE = 20;
 
 const cards = [
   {
     id: "schimmelanalyse",
     format: "INSTAGRAM · CAROUSEL",
     kicker: "CLAIM-CHECK OFFEN",
-    title: "Schimmelanalyse: vom Verdacht zum Befund",
-    question: "Darf dieser Draft in die visuelle Produktion?",
+    question: "Soll ich daraus ein Carousel zur Textprüfung machen?",
+    reason: "Der Draft hat eine Quelle, aber Bild- und Claim-Prüfung sind noch offen.",
     copy: "Von der Oberflächenprobe bis zum verständlichen Befund: Schimmel gezielt einordnen.",
+    nextStep: "Ich strukturiere zuerst Text, Claim und Quellenhinweis. Es wird nichts veröffentlicht.",
+    prepareLabel: "Ja, Textprüfung",
     source: "LumiraLab beschreibt Schimmelanalyse, MycoPatch-Diagnostik und verständliche Empfehlungen auf der Live-Website.",
     sourceUrl: "https://lumiralab.de/",
     assetNote: "Originales MycoPatch- oder Laborfoto aus Drive einsetzen; die blaue Fläche ist nur ein Platzhalter.",
@@ -16,10 +21,12 @@ const cards = [
     id: "fuenf-schritte",
     format: "INSTAGRAM · INFO",
     kicker: "QUELLE VORHANDEN",
-    title: "In fünf Schritten zu klaren Ergebnissen",
-    question: "Als Education-Post vormerken?",
+    question: "Soll ich den Ablauf als Education-Post ausarbeiten?",
+    reason: "Die fünf Schritte sind auf der Website klar vorhanden; die Social-Version braucht nur eine verständliche Dramaturgie.",
     copy: "Beratung → Probennahme → Einsendung → Analyse → Befund & Bericht",
-    source: "Die fünf Schritte stehen als Ablauf auf der LumiraLab-Website. Vor Produktion: Copy, Grafik und CTA getrennt prüfen.",
+    nextStep: "Ich erstelle einen ruhigen Education-Entwurf mit fünf Karten und einem Quellenhinweis.",
+    prepareLabel: "Ja, Education-Entwurf",
+    source: "Die fünf Schritte stehen als Ablauf auf der LumiraLab-Website. Copy, Grafik und CTA werden getrennt geprüft.",
     sourceUrl: "https://lumiralab.de/",
     assetNote: "Für das finale Motiv ein echtes Labor-/Probenahme-Asset verwenden; keine generierte Produktdarstellung als Beleg.",
   },
@@ -27,9 +34,11 @@ const cards = [
     id: "formaldehyd-voc",
     format: "INSTAGRAM · PRODUCT",
     kicker: "SACHLICH PRÜFEN",
-    title: "Formaldehyd & VOC-Analyse",
-    question: "Für einen sachlichen Produkt-Post vormerken?",
+    question: "Soll ich einen sachlichen Produkt-Entwurf vorbereiten?",
+    reason: "Die Leistung ist beschrieben, aber Messparameter und Leistungsversprechen dürfen nicht über den Beleg hinausgehen.",
     copy: "Testkits und Probenahme helfen, die Chemikalienbelastung der Luft zu erfassen und Quellen gezielt aufzuspüren.",
+    nextStep: "Ich formuliere einen vorsichtigen Entwurf und markiere jede Stelle, die noch einen Claim-Check braucht.",
+    prepareLabel: "Ja, Entwurf vorbereiten",
     source: "Die Live-Website beschreibt Formaldehyd- und VOC-Analysen sowie die Kombination aus Probenahme und Laboranalyse.",
     sourceUrl: "https://lumiralab.de/",
     assetNote: "Messparameter, Grenzwerte und Leistungsversprechen erst nach Quellen-/Claim-Ledger ergänzen.",
@@ -37,9 +46,9 @@ const cards = [
 ];
 
 const statusLabels = {
-  prepare: "Zur Produktion vorgemerkt",
-  reject: "Zurückgestellt",
-  later: "Für später gemerkt",
+  prepare: "Nächster Arbeitsschritt vorgemerkt",
+  reject: "Aus dem Stapel entfernt",
+  later: "Für später gespeichert",
 };
 
 const state = loadState();
@@ -48,15 +57,17 @@ let lastDecision = null;
 
 const els = {
   card: document.querySelector("#decisionCard"),
+  handle: document.querySelector("#swipeHandle"),
   swipeFeedback: document.querySelector("#swipeFeedback"),
   emptyState: document.querySelector("#emptyState"),
   areaChip: document.querySelector("#areaChip"),
   formatChip: document.querySelector("#formatChip"),
   cardIndex: document.querySelector("#cardIndex"),
   cardKicker: document.querySelector("#cardKicker"),
-  cardTitle: document.querySelector("#cardTitle"),
   decisionQuestion: document.querySelector("#decisionQuestion"),
+  cardReason: document.querySelector("#cardReason"),
   cardCopy: document.querySelector("#cardCopy"),
+  nextStep: document.querySelector("#nextStep"),
   sourceToggle: document.querySelector("#sourceToggle"),
   sourcePanel: document.querySelector("#sourcePanel"),
   sourceText: document.querySelector("#sourceText"),
@@ -69,6 +80,7 @@ const els = {
   undoButton: document.querySelector("#undoButton"),
   summaryGrid: document.querySelector("#summaryGrid"),
   resetButton: document.querySelector("#resetButton"),
+  prepareLabel: document.querySelector("#prepareLabel"),
 };
 
 function loadState() {
@@ -91,13 +103,12 @@ function currentCard() {
 
 function render() {
   const card = currentCard();
-  const completed = cards.length - Object.keys(state.decisions).length;
-  const visiblePosition = Math.min(state.index + 1, cards.length);
-  els.progressLabel.textContent = card ? `${visiblePosition} / ${cards.length}` : "fertig";
-  els.progressBar.style.width = `${Math.min((Object.keys(state.decisions).length / cards.length) * 100, 100)}%`;
+  const completed = Object.keys(state.decisions).length;
+  els.progressLabel.textContent = card ? `${state.index + 1} / ${cards.length}` : "fertig";
+  els.progressBar.style.width = `${Math.min((completed / cards.length) * 100, 100)}%`;
   renderSummary();
 
-  const cardParts = els.card.querySelectorAll(".card-head, .asset-placeholder, .card-body, .card-hint");
+  const cardParts = els.card.querySelectorAll(".card-head, .asset-placeholder, .card-body, .swipe-handle");
   if (!card) {
     cardParts.forEach((part) => { part.hidden = true; });
     els.emptyState.hidden = false;
@@ -114,26 +125,26 @@ function render() {
   els.formatChip.textContent = card.format;
   els.cardIndex.textContent = String(state.index + 1).padStart(2, "0");
   els.cardKicker.textContent = card.kicker;
-  els.cardTitle.textContent = card.title;
   els.decisionQuestion.textContent = card.question;
+  els.cardReason.textContent = card.reason;
   els.cardCopy.textContent = card.copy;
+  els.nextStep.textContent = card.nextStep;
+  els.prepareLabel.textContent = card.prepareLabel;
   els.sourceText.textContent = card.source;
   els.sourceLink.href = card.sourceUrl;
   els.assetNote.textContent = card.assetNote;
   els.sourcePanel.hidden = true;
   els.sourceToggle.setAttribute("aria-expanded", "false");
-  els.card.style.removeProperty("--drag-x");
-  els.card.style.removeProperty("--drag-y");
-  els.card.classList.remove("is-dragging", "is-exiting");
+  resetCardTransform();
 }
 
 function renderSummary() {
   const counts = { prepare: 0, reject: 0, later: 0 };
   Object.values(state.decisions).forEach((action) => { if (counts[action] !== undefined) counts[action] += 1; });
   els.summaryGrid.innerHTML = `
-    <div class="summary-item ${counts.prepare ? "is-active" : ""}"><strong>${counts.prepare}</strong><span>vorgemerkt</span></div>
+    <div class="summary-item ${counts.prepare ? "is-active" : ""}"><strong>${counts.prepare}</strong><span>nächster Schritt</span></div>
     <div class="summary-item ${counts.later ? "is-active" : ""}"><strong>${counts.later}</strong><span>für später</span></div>
-    <div class="summary-item ${counts.reject ? "is-active" : ""}"><strong>${counts.reject}</strong><span>zurückgestellt</span></div>`;
+    <div class="summary-item ${counts.reject ? "is-active" : ""}"><strong>${counts.reject}</strong><span>nicht weiter</span></div>`;
 }
 
 function toggleSource(event) {
@@ -143,51 +154,71 @@ function toggleSource(event) {
   els.sourcePanel.hidden = expanded;
 }
 
-function actionFromDelta(dx, dy) {
-  if (Math.abs(dx) > 82 && Math.abs(dx) > Math.abs(dy) * 1.12) return dx > 0 ? "prepare" : "reject";
-  if (dy < -82 && Math.abs(dy) > Math.abs(dx) * 1.12) return "later";
+function resetCardTransform() {
+  els.card.style.transform = "translate3d(0,0,0) rotate(0deg)";
+  els.card.classList.remove("is-dragging", "is-exiting");
+  els.swipeFeedback.classList.remove("visible");
+  els.swipeFeedback.textContent = "";
+}
+
+function actionFromDelta(dx, dy, axis = null) {
+  const lockedAxis = axis || (Math.abs(dx) >= Math.abs(dy) ? "x" : "y");
+  if (lockedAxis === "x" && Math.abs(dx) >= SWIPE_THRESHOLD_X) return dx > 0 ? "prepare" : "reject";
+  if (lockedAxis === "y" && dy <= -SWIPE_THRESHOLD_Y) return "later";
   return null;
 }
 
 function labelForAction(action) {
-  return { prepare: "VORMERKEN", reject: "STOPP", later: "SPÄTER" }[action] || "";
+  return { prepare: "JA · NÄCHSTER SCHRITT", reject: "NEIN · NICHT WEITER", later: "SPÄTER" }[action] || "";
 }
 
 function startDrag(event) {
-  if (event.target.closest("button, a")) return;
-  drag = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false };
-  els.card.setPointerCapture?.(event.pointerId);
-  els.card.classList.add("is-dragging");
+  if (event.pointerType === "mouse" && event.button !== 0) return;
+  drag = { id: event.pointerId, x: event.clientX, y: event.clientY, moved: false, axis: null };
+  els.handle.setPointerCapture?.(event.pointerId);
+  els.handle.classList.add("is-dragging");
 }
 
 function moveDrag(event) {
   if (!drag || drag.id !== event.pointerId) return;
-  const dx = event.clientX - drag.x;
-  const dy = event.clientY - drag.y;
-  if (Math.abs(dx) + Math.abs(dy) < 8) return;
+  const rawDx = event.clientX - drag.x;
+  const rawDy = event.clientY - drag.y;
+  if (!drag.moved && Math.hypot(rawDx, rawDy) < ACTIVATION_DISTANCE) return;
   drag.moved = true;
-  const rotation = Math.max(-8, Math.min(8, dx / 22));
-  els.card.style.transform = `translate3d(${dx}px, ${Math.min(dy, 30)}px, 0) rotate(${rotation}deg)`;
-  const action = actionFromDelta(dx, dy);
-  els.swipeFeedback.textContent = labelForAction(action);
-  els.swipeFeedback.classList.toggle("visible", Boolean(action));
+  if (!drag.axis && Math.max(Math.abs(rawDx), Math.abs(rawDy)) >= ACTIVATION_DISTANCE) {
+    drag.axis = Math.abs(rawDx) >= Math.abs(rawDy) ? "x" : "y";
+  }
+  const dx = drag.axis === "y" ? 0 : rawDx;
+  const dy = drag.axis === "x" ? 0 : Math.min(rawDy, 0);
+  const action = actionFromDelta(rawDx, rawDy, drag.axis);
+  const visualX = Math.max(-105, Math.min(105, dx * 0.32));
+  const visualY = Math.max(-52, Math.min(0, dy * 0.22));
+  els.card.style.transform = `translate3d(${visualX}px, ${visualY}px, 0) rotate(${visualX / 48}deg)`;
+  els.swipeFeedback.textContent = action ? labelForAction(action) : "NOCH WEITER WISCHEN";
+  els.swipeFeedback.classList.add("visible");
+  event.preventDefault();
 }
 
 function endDrag(event) {
   if (!drag || drag.id !== event.pointerId) return;
-  const dx = event.clientX - drag.x;
-  const dy = event.clientY - drag.y;
-  const wasMoved = drag.moved;
-  const action = actionFromDelta(dx, dy);
+  const rawDx = event.clientX - drag.x;
+  const rawDy = event.clientY - drag.y;
+  const action = actionFromDelta(rawDx, rawDy, drag.axis);
   drag = null;
-  els.card.classList.remove("is-dragging");
-  els.swipeFeedback.classList.remove("visible");
+  els.handle.classList.remove("is-dragging");
   if (action) {
+    els.swipeFeedback.classList.remove("visible");
     commitDecision(action);
   } else {
-    els.card.style.transform = "translate3d(0,0,0) rotate(0deg)";
-    if (!wasMoved) toggleSource(event);
+    resetCardTransform();
+    if (Math.hypot(rawDx, rawDy) >= ACTIVATION_DISTANCE) showFeedback("Noch nicht entschieden — nutze die drei klaren Buttons.", false);
   }
+}
+
+function handleKeydown(event) {
+  if (event.key === "ArrowRight") { event.preventDefault(); commitDecision("prepare"); }
+  if (event.key === "ArrowLeft") { event.preventDefault(); commitDecision("reject"); }
+  if (event.key === "ArrowUp") { event.preventDefault(); commitDecision("later"); }
 }
 
 function commitDecision(action) {
@@ -241,17 +272,11 @@ els.sourceToggle.addEventListener("click", toggleSource);
 els.undoButton.addEventListener("click", undoLast);
 els.resetButton.addEventListener("click", resetDemo);
 document.querySelector(".reset-main").addEventListener("click", resetDemo);
-els.card.addEventListener("pointerdown", startDrag);
-els.card.addEventListener("pointermove", moveDrag);
-els.card.addEventListener("pointerup", endDrag);
-els.card.addEventListener("pointercancel", endDrag);
-els.card.addEventListener("keydown", (event) => {
-  if (event.target !== els.card) return;
-  if (event.key === "ArrowRight") commitDecision("prepare");
-  if (event.key === "ArrowLeft") commitDecision("reject");
-  if (event.key === "ArrowUp") commitDecision("later");
-  if (event.key === "Enter" || event.key === " ") { event.preventDefault(); els.sourceToggle.click(); }
-});
+els.handle.addEventListener("pointerdown", startDrag);
+els.handle.addEventListener("pointermove", moveDrag);
+els.handle.addEventListener("pointerup", endDrag);
+els.handle.addEventListener("pointercancel", endDrag);
+els.handle.addEventListener("keydown", handleKeydown);
 
 if ("serviceWorker" in navigator && window.location.protocol !== "file:") {
   navigator.serviceWorker.register("sw.js").catch(() => {});
